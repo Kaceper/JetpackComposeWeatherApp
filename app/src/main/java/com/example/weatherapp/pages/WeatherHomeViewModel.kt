@@ -22,6 +22,9 @@ class WeatherHomeViewModel : ViewModel() {
     // Słówko 'by' pozwala pisać uiState zamiast uiState.value. Na start dajemy Loading
     var uiState: WeatherHomeUiState by mutableStateOf(WeatherHomeUiState.Loading)
 
+    // Coroutine - ogólnie "lekki wątek", odpowiednik "Task" z C#. Pozwala na asynchroniczną pracę bez blokowania ekranu
+    // Jeśli do ustawienia błędu potrzebujemy tylko samego wyjątku (throwable), zastępujemy go "_", żeby nie śmiecić w pamięci i kodzie
+    // exceptionHandler - odpowiednik TaskScheduler.UnobservedTaskException w .NET
     // private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
         uiState = WeatherHomeUiState.Error
@@ -40,8 +43,6 @@ class WeatherHomeViewModel : ViewModel() {
                 val forecastDeferred = async { getForecastData() }
 
                 // Czekam aż oba wrócą z wynikiem
-                // val currentWeather = async { getCurrentData() }.await()
-                // val forecastWeather = async { getForecastData() }.await()
                 // byłoby nieoptymalne bo aplikacja czekałaby na wykonanie pierwszeo
                 val currentWeather = currentDeferred.await()
 
