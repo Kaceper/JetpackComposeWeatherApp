@@ -21,10 +21,8 @@ import com.example.weatherapp.R
 import com.example.weatherapp.customuis.AppBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
-// @Preview pozwala w AndroidStudio w zakładce Design zobaczyć jak wygląda aktualnie dane Composable
-@Preview
 @Composable
-fun WeatherHomeScreen(modifier: Modifier = Modifier) {
+fun WeatherHomeScreen(uiState: WeatherHomeUiState, modifier: Modifier = Modifier) {
     // Box - odpowiednik Grid bez wierszy i kolumn z XAMLa
     // układa elementy jedne na drugich
     Box(
@@ -53,7 +51,11 @@ fun WeatherHomeScreen(modifier: Modifier = Modifier) {
             ) {
                 // Odpowiednik StackPanel (Orientation = "Vertical"), ułoży elementy jednej pod drugim
                 Column {
-                    Text("Pogoda - ekran główny", style = MaterialTheme.typography.bodyMedium)
+                    when (uiState) {
+                        is WeatherHomeUiState.Error -> Text("Błąd podczas pobierania prognozy")
+                        is WeatherHomeUiState.Loading -> Text("Wczytywanie...")
+                        is WeatherHomeUiState.Success -> Text(uiState.weather.currentWeather.main!!.temp!!.toString())
+                    }
                 }
             }
         }

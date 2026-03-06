@@ -25,7 +25,7 @@ class WeatherHomeViewModel : ViewModel() {
         // "viewModelScope" działa jak wbudowany CancellationToken
         // Jeśli użytkownik zamknie aplikację w trakcie pobierania danych to "viewModelScope" automatycznie anuluje te zapytanie żeby nie marnować zasobów
         viewModelScope.launch {
-            try {
+            uiState = try {
                 // async i await to odpowiedniki Task i await z C#
 
                 // Odpalam oba zapytania jednocześnie w tle
@@ -43,8 +43,10 @@ class WeatherHomeViewModel : ViewModel() {
                 val forecastWeather = forecastDeferred.await()
                 Log.d("WeatherHomeViewModel", "Current weather: ${currentWeather.main!!.temp}")
                 Log.d("WeatherHomeViewModel", "Forecast weather: ${forecastWeather.list!!.size}")
-            } catch (e: Exception) {
 
+                WeatherHomeUiState.Success(Weather(currentWeather, forecastWeather))
+            } catch (e: Exception) {
+                WeatherHomeUiState.Error
             }
         }
     }
@@ -56,7 +58,7 @@ class WeatherHomeViewModel : ViewModel() {
     }
 
     private suspend fun getForecastData() : ForecastWeather {
-        val endUrl = "forecast?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7"
+        val endUrl = "forecast?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7&units=metric"
 
         return weatherRepository.getForecastWeather(endUrl)
     }

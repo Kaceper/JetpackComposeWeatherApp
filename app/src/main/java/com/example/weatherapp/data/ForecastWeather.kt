@@ -50,7 +50,7 @@ data class ForecastWeather(
         @SerializedName("main")
         val main: Main? = null,
         @SerializedName("pop")
-        val pop: Int? = null,
+        val pop: Double? = null,
         @SerializedName("sys")
         val sys: Sys? = null,
         @SerializedName("visibility")

@@ -36,6 +36,7 @@ fun WeatherApp(modifier: Modifier = Modifier) {
     }
 
     WeatherAppTheme() {
-        WeatherHomeScreen();
+        // Przekazanie aktualnego stanu (Ładowanie / Sukces / Błąd) z ViewModelu do ekranu
+        WeatherHomeScreen(weatherHomeViewModel.uiState)
     }
 }
