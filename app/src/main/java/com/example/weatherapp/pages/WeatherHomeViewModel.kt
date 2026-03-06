@@ -1,6 +1,9 @@
 package com.example.weatherapp.pages
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.data.CurrentWeather
@@ -13,10 +16,14 @@ import kotlinx.coroutines.launch
 class WeatherHomeViewModel : ViewModel() {
     private val weatherRepository: WeatherRepository = WeatherRepositoryImpl()
 
+    // Obserwowalny stan UI (jak INotifyPropertyChanged w C#). Zmiana wartości odświeża ekran
+    // Słówko 'by' pozwala pisać uiState zamiast uiState.value. Na start dajemy Loading
+    var uiState: WeatherHomeUiState by mutableStateOf(WeatherHomeUiState.Loading)
+
     fun getWeatherData() {
-        // viewModelScope.launch to swego rodzaju odpowiednij Task.Run w C#
-        // viewModelScope działa jak wbudowany CancellationToken
-        // jeśli uzytkownik zamknie aplikację w trakcie pobierania danych to viewModelScope automatycznie anuluje te zapytanie żeby nie marnować zasobów
+        // "viewModelScope.launch" to swego rodzaju odpowiednij Task.Run w C#
+        // "viewModelScope" działa jak wbudowany CancellationToken
+        // Jeśli użytkownik zamknie aplikację w trakcie pobierania danych to "viewModelScope" automatycznie anuluje te zapytanie żeby nie marnować zasobów
         viewModelScope.launch {
             try {
                 // async i await to odpowiedniki Task i await z C#
