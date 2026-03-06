@@ -1,7 +1,56 @@
 package com.example.weatherapp.pages
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.weatherapp.data.CurrentWeather
+import com.example.weatherapp.data.ForecastWeather
+import com.example.weatherapp.data.WeatherRepository
+import com.example.weatherapp.data.WeatherRepositoryImpl
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 class WeatherHomeViewModel : ViewModel() {
+    private val weatherRepository: WeatherRepository = WeatherRepositoryImpl()
 
+    fun getWeatherData() {
+        // viewModelScope.launch to swego rodzaju odpowiednij Task.Run w C#
+        // viewModelScope działa jak wbudowany CancellationToken
+        // jeśli uzytkownik zamknie aplikację w trakcie pobierania danych to viewModelScope automatycznie anuluje te zapytanie żeby nie marnować zasobów
+        viewModelScope.launch {
+            try {
+                // async i await to odpowiedniki Task i await z C#
+
+                // Odpalam oba zapytania jednocześnie w tle
+                val currentDeferred = async { getCurrentData() }
+                val forecastDeferred = async { getForecastData() }
+
+                // Czekam aż oba wrócą z wynikiem
+                // val currentWeather = async { getCurrentData() }.await()
+                // val forecastWeather = async { getForecastData() }.await()
+                // byłoby nieoptymalne bo aplikacja czekałaby na wykonanie pierwszeo
+                val currentWeather = currentDeferred.await()
+
+                // !! - Non-null Assertion, jeśli wartość null to aplikacja natychmiast się zamyka (Crash)
+                // Używane raczej tylko w testach
+                val forecastWeather = forecastDeferred.await()
+                Log.d("WeatherHomeViewModel", "Current weather: ${currentWeather.main!!.temp}")
+                Log.d("WeatherHomeViewModel", "Forecast weather: ${forecastWeather.list!!.size}")
+            } catch (e: Exception) {
+
+            }
+        }
+    }
+
+    private suspend fun getCurrentData() : CurrentWeather {
+        val endUrl = "weather?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7&units=metric"
+
+        return weatherRepository.getCurrentWeather(endUrl)
+    }
+
+    private suspend fun getForecastData() : ForecastWeather {
+        val endUrl = "forecast?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7"
+
+        return weatherRepository.getForecastWeather(endUrl)
+    }
 }

@@ -21,14 +21,18 @@ import com.example.weatherapp.R
 import com.example.weatherapp.customuis.AppBackground
 
 @OptIn(ExperimentalMaterial3Api::class)
+// @Preview pozwala w AndroidStudio w zakładce Design zobaczyć jak wygląda aktualnie dane Composable
 @Preview
 @Composable
 fun WeatherHomeScreen(modifier: Modifier = Modifier) {
+    // Box - odpowiednik Grid bez wierszy i kolumn z XAMLa
+    // układa elementy jedne na drugich
     Box(
         modifier = modifier
             .fillMaxSize()
     ) {
         AppBackground(photoId = R.drawable.weather_app_background)
+        // Scaffold - odpowiednik View w XML (gotowy "szablon" strony)
         Scaffold(
             /*topBar = {
                 TopAppBar(
@@ -38,6 +42,7 @@ fun WeatherHomeScreen(modifier: Modifier = Modifier) {
             },*/
             containerColor = Color.Transparent
         ) {
+            // Surface - odpowiednik "Panel" lub "Border" w XAML
             Surface(
                color = Color.Transparent,
                 modifier = Modifier
@@ -46,6 +51,7 @@ fun WeatherHomeScreen(modifier: Modifier = Modifier) {
                     .fillMaxSize()
                     .wrapContentSize()
             ) {
+                // Odpowiednik StackPanel (Orientation = "Vertical"), ułoży elementy jednej pod drugim
                 Column {
                     Text("Pogoda - ekran główny", style = MaterialTheme.typography.bodyMedium)
                 }
