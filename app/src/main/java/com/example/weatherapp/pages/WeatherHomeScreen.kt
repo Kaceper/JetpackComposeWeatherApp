@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,14 +46,14 @@ fun WeatherHomeScreen(uiState: WeatherHomeUiState, modifier: Modifier = Modifier
                color = Color.Transparent,
                 modifier = Modifier
                     .padding(it)
-                    .padding(0.dp)
+                    .padding(10.dp)
                     .fillMaxSize()
-                    .wrapContentSize()
+                    .wrapContentSize(Alignment.Center)
             ) {
                 // Odpowiednik StackPanel (Orientation = "Vertical"), ułoży elementy jednej pod drugim
-                Column {
+                Column() {
                     when (uiState) {
-                        is WeatherHomeUiState.Error -> Text("Błąd podczas pobierania prognozy")
+                        is WeatherHomeUiState.Error -> Text("Błąd podczas pobierania")
                         is WeatherHomeUiState.Loading -> Text("Wczytywanie...")
                         is WeatherHomeUiState.Success -> Text(uiState.weather.currentWeather.main!!.temp!!.toString())
                     }

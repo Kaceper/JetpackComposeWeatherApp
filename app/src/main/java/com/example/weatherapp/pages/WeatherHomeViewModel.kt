@@ -10,8 +10,10 @@ import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.ForecastWeather
 import com.example.weatherapp.data.WeatherRepository
 import com.example.weatherapp.data.WeatherRepositoryImpl
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
+import kotlin.coroutines.coroutineContext
 
 class WeatherHomeViewModel : ViewModel() {
     private val weatherRepository: WeatherRepository = WeatherRepositoryImpl()
@@ -20,11 +22,16 @@ class WeatherHomeViewModel : ViewModel() {
     // Słówko 'by' pozwala pisać uiState zamiast uiState.value. Na start dajemy Loading
     var uiState: WeatherHomeUiState by mutableStateOf(WeatherHomeUiState.Loading)
 
+    // private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        uiState = WeatherHomeUiState.Error
+    }
+
     fun getWeatherData() {
         // "viewModelScope.launch" to swego rodzaju odpowiednij Task.Run w C#
         // "viewModelScope" działa jak wbudowany CancellationToken
         // Jeśli użytkownik zamknie aplikację w trakcie pobierania danych to "viewModelScope" automatycznie anuluje te zapytanie żeby nie marnować zasobów
-        viewModelScope.launch {
+        viewModelScope.launch(exceptionHandler) {
             uiState = try {
                 // async i await to odpowiedniki Task i await z C#
 
