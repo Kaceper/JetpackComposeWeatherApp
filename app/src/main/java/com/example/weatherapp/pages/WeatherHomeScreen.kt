@@ -1,5 +1,7 @@
 package com.example.weatherapp.pages
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,6 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
 import com.example.weatherapp.customuis.AppBackground
+import com.example.weatherapp.data.CurrentWeather
+import com.example.weatherapp.data.ForecastWeather
+import com.example.weatherapp.utils.getFormattedDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -55,10 +60,33 @@ fun WeatherHomeScreen(uiState: WeatherHomeUiState, modifier: Modifier = Modifier
                     when (uiState) {
                         is WeatherHomeUiState.Error -> Text("Błąd podczas pobierania")
                         is WeatherHomeUiState.Loading -> Text("Wczytywanie...")
-                        is WeatherHomeUiState.Success -> Text(uiState.weather.currentWeather.main!!.temp!!.toString())
+                        is WeatherHomeUiState.Success -> WeatherSection(weather = uiState.weather)
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun WeatherSection(weather: Weather, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.padding(8.dp)) {
+        CurrentWeatherSecion(weather.currentWeather, modifier = Modifier.weight(1f))
+        ForecastWeatherSecion(weather.forecastWeather, modifier = Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun CurrentWeatherSecion(currentWeather: CurrentWeather, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(getFormattedDate(currentWeather.dt!!), style = MaterialTheme.typography.bodySmall)
+        Text("${currentWeather.name}, ${currentWeather.sys?.country}", style = MaterialTheme.typography.titleMedium)
+    }
+}
+
+@Composable
+fun ForecastWeatherSecion(forecastWeather: ForecastWeather, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+
     }
 }

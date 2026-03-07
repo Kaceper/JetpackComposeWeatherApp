@@ -11,7 +11,7 @@ val weatherTypography = Typography(
     displaySmall = Typography.displaySmall.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 40.sp),
     titleLarge = Typography.titleLarge.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 35.sp),
     titleMedium = Typography.titleMedium.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 32.sp),
-    titleSmall = Typography.titleSmall.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 30.sp),
+    titleSmall = Typography.titleSmall.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 26.sp),
     bodyLarge = Typography.bodyLarge.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 25.sp),
     bodyMedium = Typography.bodyMedium.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 22.sp),
     bodySmall = Typography.bodySmall.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 20.sp),
