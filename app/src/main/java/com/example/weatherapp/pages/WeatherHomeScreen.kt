@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.weatherapp.R
@@ -58,7 +59,14 @@ fun WeatherHomeScreen(uiState: WeatherHomeUiState, modifier: Modifier = Modifier
                 // Odpowiednik StackPanel (Orientation = "Vertical"), ułoży elementy jednej pod drugim
                 Column() {
                     when (uiState) {
-                        is WeatherHomeUiState.Error -> Text("Błąd podczas pobierania")
+                        is WeatherHomeUiState.Error -> {
+                            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text("Błąd podczas pobierania")
+                                if (uiState.errorMessage.isNotEmpty()) {
+                                    Text(text = uiState.errorMessage, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
+                                }
+                            }
+                        }
                         is WeatherHomeUiState.Loading -> Text("Wczytywanie...")
                         is WeatherHomeUiState.Success -> WeatherSection(weather = uiState.weather)
                     }

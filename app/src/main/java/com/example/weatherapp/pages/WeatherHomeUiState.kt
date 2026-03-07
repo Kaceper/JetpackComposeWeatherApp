@@ -14,7 +14,7 @@ sealed interface WeatherHomeUiState {
     data class Success(val weather : Weather) : WeatherHomeUiState
 
     // Stan, gdy coś poszło nie tak (błąd), używamy "data object" ponieważ nie zawiera danych
-    data object Error : WeatherHomeUiState
+    data class Error(val errorMessage: String) : WeatherHomeUiState
 
     // Stan, gdy czekam na pobranie danych, używamy "data object" ponieważ nie zawiera danych
     data object Loading : WeatherHomeUiState

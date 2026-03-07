@@ -27,7 +27,7 @@ class WeatherHomeViewModel : ViewModel() {
     // exceptionHandler - odpowiednik TaskScheduler.UnobservedTaskException w .NET
     // private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
     private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-        uiState = WeatherHomeUiState.Error
+        uiState = WeatherHomeUiState.Error(throwable.message.toString())
     }
 
     fun getWeatherData() {
@@ -54,7 +54,7 @@ class WeatherHomeViewModel : ViewModel() {
 
                 WeatherHomeUiState.Success(Weather(currentWeather, forecastWeather))
             } catch (e: Exception) {
-                WeatherHomeUiState.Error
+                WeatherHomeUiState.Error(e.message.toString())
             }
         }
     }
