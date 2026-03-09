@@ -1,7 +1,9 @@
 package com.example.weatherapp.pages
 
-import android.graphics.Paint
+import android.graphics.Canvas
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,29 +17,28 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Compress
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.WaterDrop
+import androidx.compose.material.icons.outlined.WbTwilight
+import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
@@ -50,6 +51,9 @@ import com.example.weatherapp.utils.degree
 import com.example.weatherapp.utils.dot
 import com.example.weatherapp.utils.getFormattedDate
 import com.example.weatherapp.utils.getIconUrl
+import com.google.gson.Gson
+
+val temperatury = listOf(10f, 50f, 30f, 80f, 40f)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,13 +107,13 @@ fun WeatherHomeScreen(uiState: WeatherHomeUiState, modifier: Modifier = Modifier
 @Composable
 fun WeatherSection(weather: Weather, modifier: Modifier = Modifier) {
     Column(modifier = modifier.padding(8.dp)) {
-        CurrentWeatherSecion(weather.currentWeather, modifier = Modifier.weight(1f))
+        CurrentWeatherSection(weather.currentWeather, modifier = Modifier.weight(1f))
         ForecastWeatherSecion(weather.forecastWeather, modifier = Modifier.weight(1f))
     }
 }
 
 @Composable
-fun CurrentWeatherSecion(currentWeather: CurrentWeather, modifier: Modifier = Modifier) {
+fun CurrentWeatherSection(currentWeather: CurrentWeather, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
         Text("${currentWeather.name}, ${currentWeather.sys?.country}", style = MaterialTheme.typography.titleSmall)
         (Spacer(modifier = Modifier.height(10.dp)))
@@ -130,10 +134,98 @@ fun CurrentWeatherSecion(currentWeather: CurrentWeather, modifier: Modifier = Mo
             MaterialTheme.typography.displayLarge
         )
         Text("Odczuwalna ${currentWeather.main?.feelsLike?.toInt()}${degree}", style = MaterialTheme.typography.bodySmall)
-        (Spacer(modifier = Modifier.height(8.dp)))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Maks. ${currentWeather.main?.tempMax?.toInt()}${degree} $dot ", style = MaterialTheme.typography.bodySmall)
-            Text("Min. ${currentWeather.main?.tempMin?.toInt()}${degree}", style = MaterialTheme.typography.bodySmall)
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center,
+            modifier = Modifier
+                .padding(start = 25.dp, top = 0.dp, bottom = 0.dp, end = 25.dp)
+                .fillMaxWidth()
+                .height(70.dp)
+                .background(
+                    color = Color.White.copy(alpha = 0.15f),
+                    shape = RoundedCornerShape(180.dp)
+                )
+                .border(
+                    width = 0.5.dp,
+                    color = Color.White.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(180.dp)
+                )) {
+            Column(modifier = Modifier.weight(0.25f)) { }
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Outlined.WaterDrop,
+                    contentDescription = "Strona główna",
+                    tint = Color.White,
+                )
+                Text(
+                   "${currentWeather.main?.humidity}%",
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Outlined.Compress,
+                    contentDescription = "Strona główna",
+                    tint = Color.White
+                )
+                Text(
+                    "${currentWeather.main?.pressure} hPa",
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+            Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
+                Icon(
+                    imageVector = Icons.Rounded.Air,
+                    contentDescription = "Strona główna",
+                    tint = Color.White
+                )
+                Text(
+                    "${currentWeather.wind?.speed?.toInt()}km/h",
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+            Column(modifier = Modifier.weight(0.25f)) { }
+        }
+    }
+}
+
+@Composable
+fun ChartWithLabels(temps: List<Float>) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        VerySimpleChart(
+            data = temps,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp)
+                .padding(horizontal = 10.dp)
+        )
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            temps.forEach { temp ->
+                Text("${temp.toInt()}°", color = Color.White, style = MaterialTheme.typography.labelSmall)
+            }
+        }
+    }
+}
+@Composable
+fun VerySimpleChart(data: List<Float>, modifier: Modifier) {
+    Canvas(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(100.dp)
+            .background(Color.Transparent)
+    ) {
+        val spacex = size.width / (data.size - 1)
+
+        for (i in 0 until data.size - 1) {
+            drawLine(
+                color = Color.Cyan,
+                start = Offset(x = i * spacex, y = size.height - data[i]),
+                end = Offset(x = (i + 1) * spacex, y = size.height - data[i + 1]),
+                strokeWidth = 4f
+            )
         }
     }
 }
@@ -141,6 +233,6 @@ fun CurrentWeatherSecion(currentWeather: CurrentWeather, modifier: Modifier = Mo
 @Composable
 fun ForecastWeatherSecion(forecastWeather: ForecastWeather, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-
+        ChartWithLabels(temps = temperatury)
     }
 }

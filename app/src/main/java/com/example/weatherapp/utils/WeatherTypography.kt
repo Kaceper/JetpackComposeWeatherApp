@@ -16,4 +16,5 @@ val weatherTypography = Typography(
     bodyLarge = Typography.bodyLarge.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 25.sp),
     bodyMedium = Typography.bodyMedium.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 22.sp),
     bodySmall = Typography.bodySmall.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 20.sp),
+    labelSmall = Typography.labelSmall.copy(fontFamily = appFontFamily, color = Color.White, fontSize = 16.sp),
 )
