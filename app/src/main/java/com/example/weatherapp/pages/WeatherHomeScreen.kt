@@ -1,11 +1,19 @@
 package com.example.weatherapp.pages
 
+import android.graphics.Paint
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -17,15 +25,30 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.example.weatherapp.R
 import com.example.weatherapp.customuis.AppBackground
+import com.example.weatherapp.customuis.CroppedText
 import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.ForecastWeather
+import com.example.weatherapp.utils.degree
 import com.example.weatherapp.utils.getFormattedDate
+import com.example.weatherapp.utils.getIconUrl
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -87,8 +110,25 @@ fun WeatherSection(weather: Weather, modifier: Modifier = Modifier) {
 @Composable
 fun CurrentWeatherSecion(currentWeather: CurrentWeather, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-        Text(getFormattedDate(currentWeather.dt!!), style = MaterialTheme.typography.bodySmall)
-        Text("${currentWeather.name}, ${currentWeather.sys?.country}", style = MaterialTheme.typography.titleMedium)
+        Text("${currentWeather.name}, ${currentWeather.sys?.country}", style = MaterialTheme.typography.titleSmall)
+        (Spacer(modifier = Modifier.height(10.dp)))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            AsyncImage(model = ImageRequest.Builder(LocalContext.current)
+                .data(getIconUrl(currentWeather.weather?.get(0)!!.icon!!))
+                .crossfade(true)
+                .build(),
+                contentDescription = null,
+                modifier = Modifier.size(50.dp))
+            Text("${currentWeather.weather?.get(0)!!.description}", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
+            Spacer(modifier = Modifier.width(32.dp))
+        }
+        CroppedText(
+            text = "${currentWeather.main?.temp?.toInt()}$degree",
+            topCrop = 30.dp,
+            bottomCrop = 0.dp,
+            MaterialTheme.typography.displayLarge
+        )
+        Text("Odczuwalna ${currentWeather.main?.feelsLike?.toInt()}${degree}", style = MaterialTheme.typography.bodySmall)
     }
 }
 

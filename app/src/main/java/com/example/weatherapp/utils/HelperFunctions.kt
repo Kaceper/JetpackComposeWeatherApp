@@ -7,3 +7,7 @@ import java.util.Locale
 fun getFormattedDate(dt: Int, pattern: String = "d MMMM yyyy"): String {
     return SimpleDateFormat(pattern, Locale.forLanguageTag("pl-PL")).format(Date(dt.toLong() * 1000))
 }
+
+fun getIconUrl(icon: String) : String {
+    return "https://openweathermap.org/img/wn/$icon@2x.png"
+}

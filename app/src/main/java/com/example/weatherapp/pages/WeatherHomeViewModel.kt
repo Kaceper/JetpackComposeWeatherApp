@@ -60,13 +60,13 @@ class WeatherHomeViewModel : ViewModel() {
     }
 
     private suspend fun getCurrentData() : CurrentWeather {
-        val endUrl = "weather?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7&units=metric"
+        val endUrl = "weather?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7&lang=pl&units=metric"
 
         return weatherRepository.getCurrentWeather(endUrl)
     }
 
     private suspend fun getForecastData() : ForecastWeather {
-        val endUrl = "forecast?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7&units=metric"
+        val endUrl = "forecast?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7&lang=pl&units=metric"
 
         return weatherRepository.getForecastWeather(endUrl)
     }
