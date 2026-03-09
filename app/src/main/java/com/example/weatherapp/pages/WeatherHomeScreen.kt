@@ -47,6 +47,7 @@ import com.example.weatherapp.customuis.CroppedText
 import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.ForecastWeather
 import com.example.weatherapp.utils.degree
+import com.example.weatherapp.utils.dot
 import com.example.weatherapp.utils.getFormattedDate
 import com.example.weatherapp.utils.getIconUrl
 
@@ -129,6 +130,11 @@ fun CurrentWeatherSecion(currentWeather: CurrentWeather, modifier: Modifier = Mo
             MaterialTheme.typography.displayLarge
         )
         Text("Odczuwalna ${currentWeather.main?.feelsLike?.toInt()}${degree}", style = MaterialTheme.typography.bodySmall)
+        (Spacer(modifier = Modifier.height(8.dp)))
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Maks. ${currentWeather.main?.tempMax?.toInt()}${degree} $dot ", style = MaterialTheme.typography.bodySmall)
+            Text("Min. ${currentWeather.main?.tempMin?.toInt()}${degree}", style = MaterialTheme.typography.bodySmall)
+        }
     }
 }
 
