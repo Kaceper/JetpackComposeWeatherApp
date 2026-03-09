@@ -120,7 +120,7 @@ fun CurrentWeatherSecion(currentWeather: CurrentWeather, modifier: Modifier = Mo
                 contentDescription = null,
                 modifier = Modifier.size(50.dp))
             Text("${currentWeather.weather?.get(0)!!.description}", style = MaterialTheme.typography.bodyMedium, textAlign = TextAlign.Center)
-            Spacer(modifier = Modifier.width(32.dp))
+            Spacer(modifier = Modifier.width(16.dp))
         }
         CroppedText(
             text = "${currentWeather.main?.temp?.toInt()}$degree",
