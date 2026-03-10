@@ -1,6 +1,5 @@
 package com.example.weatherapp.pages
 
-import android.graphics.Canvas
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,18 +11,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Compress
-import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.WaterDrop
-import androidx.compose.material.icons.outlined.WbTwilight
 import androidx.compose.material.icons.rounded.Air
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -48,10 +43,8 @@ import com.example.weatherapp.customuis.CroppedText
 import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.ForecastWeather
 import com.example.weatherapp.utils.degree
-import com.example.weatherapp.utils.dot
-import com.example.weatherapp.utils.getFormattedDate
 import com.example.weatherapp.utils.getIconUrl
-import com.google.gson.Gson
+import androidx.compose.ui.res.stringResource
 
 val temperatury = listOf(10f, 50f, 30f, 80f, 40f)
 
@@ -89,13 +82,13 @@ fun WeatherHomeScreen(uiState: WeatherHomeUiState, modifier: Modifier = Modifier
                     when (uiState) {
                         is WeatherHomeUiState.Error -> {
                             Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text("Błąd podczas pobierania")
+                                Text(text = stringResource(R.string.error_while_loading))
                                 if (uiState.errorMessage.isNotEmpty()) {
                                     Text(text = uiState.errorMessage, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center)
                                 }
                             }
                         }
-                        is WeatherHomeUiState.Loading -> Text("Wczytywanie...")
+                        is WeatherHomeUiState.Loading -> Text(text = stringResource(R.string.loading))
                         is WeatherHomeUiState.Success -> WeatherSection(weather = uiState.weather)
                     }
                 }
@@ -133,7 +126,7 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather, modifier: Modifier = M
             bottomCrop = 0.dp,
             MaterialTheme.typography.displayLarge
         )
-        Text("Odczuwalna ${currentWeather.main?.feelsLike?.toInt()}${degree}", style = MaterialTheme.typography.bodySmall)
+        Text("${stringResource(R.string.read_feel_temperature)} ${currentWeather.main?.feelsLike?.toInt()}${degree}", style = MaterialTheme.typography.bodySmall)
         Spacer(modifier = Modifier.height(24.dp))
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center,
             modifier = Modifier
@@ -153,7 +146,7 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather, modifier: Modifier = M
             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
                     imageVector = Icons.Outlined.WaterDrop,
-                    contentDescription = "Strona główna",
+                    contentDescription = stringResource(R.string.humidity),
                     tint = Color.White,
                 )
                 Text(
@@ -164,18 +157,18 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather, modifier: Modifier = M
             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
                     imageVector = Icons.Outlined.Compress,
-                    contentDescription = "Strona główna",
+                    contentDescription = stringResource(R.string.pressure),
                     tint = Color.White
                 )
                 Text(
-                    "${currentWeather.main?.pressure} hPa",
+                    "${currentWeather.main?.pressure}hPa",
                     style = MaterialTheme.typography.labelSmall
                 )
             }
             Column(modifier = Modifier.weight(1f), horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(
                     imageVector = Icons.Rounded.Air,
-                    contentDescription = "Strona główna",
+                    contentDescription = stringResource(R.string.wind_speed),
                     tint = Color.White
                 )
                 Text(
@@ -185,6 +178,13 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather, modifier: Modifier = M
             }
             Column(modifier = Modifier.weight(0.25f)) { }
         }
+    }
+}
+
+@Composable
+fun ForecastWeatherSecion(forecastWeather: ForecastWeather, modifier: Modifier = Modifier) {
+    Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+        ChartWithLabels(temps = temperatury)
     }
 }
 
@@ -227,12 +227,5 @@ fun VerySimpleChart(data: List<Float>, modifier: Modifier) {
                 strokeWidth = 4f
             )
         }
-    }
-}
-
-@Composable
-fun ForecastWeatherSecion(forecastWeather: ForecastWeather, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
-        ChartWithLabels(temps = temperatury)
     }
 }

@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">WeatherApp</string>
+    <string name="error_while_loading">Błąd podczas pobierania</string>
+    <string name="loading">Wczytywanie...</string>
+    <string name="read_feel_temperature">Odczuwalna</string>
+    <string name="humidity">Wilgotność</string>
+    <string name="pressure">Ciśnienie</string>
+    <string name="wind_speed">Wiatr</string>
 </resources>
