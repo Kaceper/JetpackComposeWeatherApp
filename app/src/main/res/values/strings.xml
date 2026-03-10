@@ -6,4 +6,6 @@
     <string name="humidity">Wilgotność</string>
     <string name="pressure">Ciśnienie</string>
     <string name="wind_speed">Wiatr</string>
+    <string name="six_days_forecast_weather">6-dniowa prognoza</string>
+    <string name="today">DZIŚ</string>
 </resources>

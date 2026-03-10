@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -15,11 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Compress
 import androidx.compose.material.icons.outlined.WaterDrop
 import androidx.compose.material.icons.rounded.Air
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +48,8 @@ import com.example.weatherapp.data.ForecastWeather
 import com.example.weatherapp.utils.degree
 import com.example.weatherapp.utils.getIconUrl
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextDecoration
+import com.example.weatherapp.data.DailyForecast
 
 val temperatury = listOf(10f, 50f, 30f, 80f, 40f)
 
@@ -99,9 +104,9 @@ fun WeatherHomeScreen(uiState: WeatherHomeUiState, modifier: Modifier = Modifier
 
 @Composable
 fun WeatherSection(weather: Weather, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.padding(8.dp)) {
+    Column(modifier = modifier.padding(12.dp)) {
         CurrentWeatherSection(weather.currentWeather, modifier = Modifier.weight(1f))
-        ForecastWeatherSecion(weather.forecastWeather, modifier = Modifier.weight(1f))
+        ForecastWeatherSection(weather.dailyForecast, modifier = Modifier.weight(1f))
     }
 }
 
@@ -182,9 +187,23 @@ fun CurrentWeatherSection(currentWeather: CurrentWeather, modifier: Modifier = M
 }
 
 @Composable
-fun ForecastWeatherSecion(forecastWeather: ForecastWeather, modifier: Modifier = Modifier) {
-    Column(modifier = modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+fun ForecastWeatherSection(dailyForecast: List<DailyForecast>, modifier: Modifier = Modifier) {
+    Column (modifier = modifier.fillMaxSize()) {
         ChartWithLabels(temps = temperatury)
+        Column(modifier.weight(1f)) {
+            Spacer(modifier = Modifier.weight(0.3f))
+            Text(stringResource(R.string.six_days_forecast_weather), style = MaterialTheme.typography.bodySmall)
+            Spacer(modifier = Modifier.height(8.dp))
+            LazyRow(
+                horizontalArrangement = Arrangement.spacedBy(20.dp),
+                modifier = Modifier.weight(0.55f)
+            ) {
+                items(dailyForecast.size) { index ->
+                    DailyForecastWeatherItem(dailyForecast[index])
+                }
+            }
+            Spacer(modifier = Modifier.weight(0.05f))
+        }
     }
 }
 
@@ -227,5 +246,55 @@ fun VerySimpleChart(data: List<Float>, modifier: Modifier) {
                 strokeWidth = 4f
             )
         }
+    }
+}
+
+@Composable
+fun DailyForecastWeatherItem(item: DailyForecast, modifier: Modifier = Modifier) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxSize()
+            .width(80.dp)
+            .background(
+                color = Color.White.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(25.dp)
+            )
+            .border(
+                width = 0.5.dp,
+                color = Color.White.copy(alpha = 0.5f),
+                shape = RoundedCornerShape(25.dp)
+            )
+    ) {
+        val displayDay = when (val name = item.dayName) {
+            is Int -> stringResource(name)
+            else -> name.toString()
+        }
+
+        Text(
+            text = displayDay,
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center
+        )
+        AsyncImage(
+            model = ImageRequest.Builder(LocalContext.current)
+                .data(getIconUrl(item.icon))
+                .crossfade(true)
+                .build(),
+            contentDescription = null,
+            modifier = Modifier.size(50.dp)
+        )
+        Text(
+            item.tempMax,
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            item.tempMin,
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            color = Color.LightGray
+        )
     }
 }
