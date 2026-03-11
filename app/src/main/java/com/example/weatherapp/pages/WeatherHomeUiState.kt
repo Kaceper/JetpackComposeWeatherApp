@@ -3,10 +3,15 @@ package com.example.weatherapp.pages
 import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.DailyForecast
 import com.example.weatherapp.data.ForecastWeather
+import com.example.weatherapp.data.HourlyForecast
 
 // "data class" to odpowiednik "record" z C# 9.0+.
 // automatycznie generuje: equals(), hashCode(), toString() oraz copy().
-data class Weather(val currentWeather: CurrentWeather, val forecastWeather: ForecastWeather, val dailyForecast: List<DailyForecast>)
+data class Weather(
+    val currentWeather: CurrentWeather,
+    val hourlyForecast: List<HourlyForecast>,
+    val dailyForecast: List<DailyForecast>
+)
 
 // Określenie stanów dla ekranu, dzięki temu nie wyświetlimy kółka ładowania i danych jednocześnie
 // Swego rodzaju ENUM

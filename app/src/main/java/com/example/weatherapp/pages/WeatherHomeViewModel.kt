@@ -11,6 +11,7 @@ import com.example.weatherapp.R
 import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.DailyForecast
 import com.example.weatherapp.data.ForecastWeather
+import com.example.weatherapp.data.HourlyForecast
 import com.example.weatherapp.data.WeatherRepository
 import com.example.weatherapp.data.WeatherRepositoryImpl
 import com.example.weatherapp.utils.degree
@@ -54,12 +55,13 @@ class WeatherHomeViewModel : ViewModel() {
                 // Używane raczej tylko w testach
                 val forecastWeather = forecastDeferred.await()
 
+                val hourlyList = mapToHourlyForecast(forecastWeather)
                 val dailyList = mapToDailyForecast(forecastWeather)
 
                 Log.d("WeatherHomeViewModel", "Current weather: ${currentWeather.main!!.temp}")
                 Log.d("WeatherHomeViewModel", "Forecast weather: ${forecastWeather.list!!.size}")
 
-                WeatherHomeUiState.Success(Weather(currentWeather, forecastWeather, dailyList))
+                WeatherHomeUiState.Success(Weather(currentWeather, hourlyList, dailyList))
             } catch (e: Exception) {
                 WeatherHomeUiState.Error(e.message.toString())
             }
@@ -79,6 +81,25 @@ class WeatherHomeViewModel : ViewModel() {
     }
 
     /**
+     * Funckaj przygotowująca prognozę pogody godzinową w postaci listy na bazie odpowiedzi z API o nadchodzącej pogodzie
+     * @param forecast zwrócona przez API prognoza pogody
+     * @return lsita opisująca prognozę pogody godzinową
+     */
+    private fun mapToHourlyForecast(forecast: ForecastWeather) : List<HourlyForecast> {
+        val items = forecast.list?.filterNotNull() ?: return emptyList()
+
+        // Grupujemy po dacie wycinając datę, np. z "2026-03-11 18:00:00" wyciągamy tylko "18:00:00"
+        val groupedByDayAndHour = items.take(7).groupBy { it.dtTxt }
+
+        return groupedByDayAndHour.map { (dateStr, dayItems) ->
+            HourlyForecast(
+                temp = dayItems.firstOrNull()?.main?.temp!!,
+                hour = dateStr?.substringAfter(" ").toString().substringBeforeLast(":")
+            )
+        }
+    }
+
+    /**
      * Funkcja przygtowująca prognozę pogody per dzień w postaci listy na bazie odpowiedzi z API o nadchodzącej pogodzie
      * @param forecast zwrócona przez API prognoza pogody
      * @return lista opisująca prognozę pogody per dzień
@@ -95,8 +116,8 @@ class WeatherHomeViewModel : ViewModel() {
             // Maksymalna temperatura z danego dnia
             val maxTemp = dayItems.maxOf { it.main?.temp ?: 0.0 }.toInt()
 
-            // Wyciągam ikonę opisującą pogodę danego dnia która jest przypisana do pogody o godzinie 12:00:00 - nie ma w API określenia ikoną danego dnia
-            val icon = dayItems.find { it.dtTxt?.contains("12:00:00") == true }?.weather?.firstOrNull()?.icon
+            // Wyciągam ikonę opisującą pogodę danego dnia która jest przypisana do pogody o godzinie 15:00:00 - nie ma w API określenia ikoną danego dnia
+            val icon = dayItems.find { it.dtTxt?.contains("15:00:00") == true }?.weather?.firstOrNull()?.icon
                 ?: dayItems.firstOrNull()?.weather?.firstOrNull()?.icon ?: ""
 
             DailyForecast(
