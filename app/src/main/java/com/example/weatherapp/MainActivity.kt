@@ -59,6 +59,7 @@ fun WeatherApp(client: FusedLocationProviderClient, modifier: Modifier = Modifie
     }
 
     // LauchedEffect - to wykona się tylko raz przy starcie ekranu
+    // Unit - void - wykona się tylko raz a nie na bazie zmiany jakiegoś prametru jak niżej 'permissionGranted'
     LaunchedEffect(Unit) {
         val isPermissionGranted =
             ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
