@@ -25,3 +25,11 @@ sealed interface WeatherHomeUiState {
     // Stan, gdy czekam na pobranie danych, używamy "data object" ponieważ nie zawiera danych
     data object Loading : WeatherHomeUiState
 }
+
+/**
+ * Interfejs określający stan połączenia z internetem
+ */
+sealed interface ConnectivityState {
+    data object Available: ConnectivityState
+    data object  Unavailable: ConnectivityState
+}

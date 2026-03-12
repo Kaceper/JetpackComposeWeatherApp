@@ -1,23 +1,32 @@
 package com.example.weatherapp
 
+import android.Manifest
+import android.content.Context
 import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresPermission
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import androidx.core.location.LocationManagerCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.weatherapp.pages.ConnectivityState
 import com.example.weatherapp.pages.WeatherHomeScreen
+import com.example.weatherapp.pages.WeatherHomeUiState
 import com.example.weatherapp.pages.WeatherHomeViewModel
 import com.example.weatherapp.ui.theme.WeatherAppTheme
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -40,7 +49,7 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun WeatherApp(client: FusedLocationProviderClient, modifier: Modifier = Modifier) {
-    val weatherHomeViewModel : WeatherHomeViewModel = viewModel()
+    val weatherHomeViewModel : WeatherHomeViewModel = viewModel(factory = WeatherHomeViewModel.Factory)
 
     val context = LocalContext.current
     // Stan uprawnień:
@@ -78,15 +87,43 @@ fun WeatherApp(client: FusedLocationProviderClient, modifier: Modifier = Modifie
 
     LaunchedEffect(permissionGranted) {
         if (permissionGranted) {
-            client.lastLocation.addOnSuccessListener {
-                weatherHomeViewModel.updateCoordinates(it.latitude, it.longitude)
-                weatherHomeViewModel.getWeatherData()
-            }
+            checkLocationAndFetch(context, client, weatherHomeViewModel, true)
         }
     }
 
+    val connectivityState by weatherHomeViewModel.connectivityState.collectAsState()
+
     WeatherAppTheme() {
         // Przekazanie aktualnego stanu (Ładowanie / Sukces / Błąd) z ViewModelu do ekranu
-        WeatherHomeScreen(weatherHomeViewModel.uiState)
+        WeatherHomeScreen(isConnected = connectivityState == ConnectivityState.Available, onRefresh = {
+            checkLocationAndFetch(context, client, weatherHomeViewModel, true)
+        }
+            , uiState =  weatherHomeViewModel.uiState)
+    }
+}
+
+/**
+ * Funkcja obsługująca wywołanie zapytania API o prognozę pogody jeśli lokaliazcja GPS jest włączona, jest zgoda na uprawenienie do GPSa i współrzędne są prawidłowe
+ */
+@RequiresPermission(allOf = [Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION])
+fun checkLocationAndFetch(context: Context, client: FusedLocationProviderClient, viewModel: WeatherHomeViewModel, permissionGranted: Boolean) {
+    viewModel.uiState = WeatherHomeUiState.Loading
+    if (!permissionGranted) {
+        viewModel.uiState = WeatherHomeUiState.Error(context.getString(R.string.no_location_permission))
+        return
+    }
+
+    val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+    if (LocationManagerCompat.isLocationEnabled(locationManager)) {
+        client.lastLocation.addOnSuccessListener { location ->
+            if (location != null) {
+                viewModel.updateCoordinates(location.latitude, location.longitude)
+                viewModel.getWeatherData()
+            } else {
+                viewModel.uiState = WeatherHomeUiState.Error(context.getString(R.string.no_location_found))
+            }
+        }
+    } else {
+        viewModel.uiState = WeatherHomeUiState.Error(context.getString(R.string.no_location_enabled))
     }
 }

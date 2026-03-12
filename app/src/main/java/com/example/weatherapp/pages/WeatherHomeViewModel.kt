@@ -1,15 +1,24 @@
 package com.example.weatherapp.pages
 
+import android.app.Application
+import android.content.Context
+import android.net.ConnectivityManager
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.weatherapp.R
+import com.example.weatherapp.data.ConnectivityRepository
 import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.DailyForecast
+import com.example.weatherapp.data.DefaultConnectivityRepository
 import com.example.weatherapp.data.ForecastWeather
 import com.example.weatherapp.data.HourlyForecast
 import com.example.weatherapp.data.WeatherRepository
@@ -17,9 +26,10 @@ import com.example.weatherapp.data.WeatherRepositoryImpl
 import com.example.weatherapp.utils.degree
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class WeatherHomeViewModel : ViewModel() {
+class WeatherHomeViewModel(private val connectivityRepository: ConnectivityRepository) : ViewModel() {
     private val weatherRepository: WeatherRepository = WeatherRepositoryImpl()
 
     var latitude by mutableDoubleStateOf(0.0)
@@ -32,6 +42,8 @@ class WeatherHomeViewModel : ViewModel() {
         latitude = lat
         longitude = lon
     }
+
+    val connectivityState: StateFlow<ConnectivityState> = connectivityRepository.connectivityState
 
     // Obserwowalny stan UI (jak INotifyPropertyChanged w C#). Zmiana wartości odświeża ekran
     // Słówko 'by' pozwala pisać uiState zamiast uiState.value. Na start dajemy Loading
@@ -158,6 +170,20 @@ class WeatherHomeViewModel : ViewModel() {
             }
         } catch (e: Exception) {
             dateStr ?: ""
+        }
+    }
+
+    /**
+     * companion object to w Kotlinie odpowiednik słównika static z C# i Javy
+     * Przechowuje zmienne i funkcje, które przynależą do samej klasy a nie do jej konkretnych instancji
+     */
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as Application)
+                val connectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                WeatherHomeViewModel(connectivityRepository = DefaultConnectivityRepository(connectivityManager))
+            }
         }
     }
 }

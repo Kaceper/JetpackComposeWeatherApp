@@ -8,4 +8,8 @@
     <string name="wind_speed">Wiatr</string>
     <string name="six_days_forecast_weather">6-dniowa prognoza</string>
     <string name="today">DZIŚ</string>
+    <string name="no_internet_connection">Brak połączenia z internetem</string>
+    <string name="no_location_permission">Brak uprawnień lokalizacji</string>
+    <string name="no_location_enabled">Lokalizacja jest wyłączona</string>
+    <string name="no_location_found">Brak współrzędnych GPS</string>"
 </resources>
