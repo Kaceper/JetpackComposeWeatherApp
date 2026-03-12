@@ -2,9 +2,9 @@ package com.example.weatherapp.pages
 
 import android.util.Log
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapp.R
@@ -18,10 +18,20 @@ import com.example.weatherapp.utils.degree
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import kotlin.coroutines.coroutineContext
 
 class WeatherHomeViewModel : ViewModel() {
     private val weatherRepository: WeatherRepository = WeatherRepositoryImpl()
+
+    var latitude by mutableDoubleStateOf(0.0)
+        private set
+
+    var longitude by mutableDoubleStateOf(0.0)
+        private set
+
+    fun updateCoordinates(lat: Double, lon: Double) {
+        latitude = lat
+        longitude = lon
+    }
 
     // Obserwowalny stan UI (jak INotifyPropertyChanged w C#). Zmiana wartości odświeża ekran
     // Słówko 'by' pozwala pisać uiState zamiast uiState.value. Na start dajemy Loading
@@ -69,13 +79,13 @@ class WeatherHomeViewModel : ViewModel() {
     }
 
     private suspend fun getCurrentData() : CurrentWeather {
-        val endUrl = "weather?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7&lang=pl&units=metric"
+        val endUrl = "weather?lat=${latitude}&lon=${longitude}&appid=9152e67158d8e2a836aaf71f98a45cc7&lang=pl&units=metric"
 
         return weatherRepository.getCurrentWeather(endUrl)
     }
 
     private suspend fun getForecastData() : ForecastWeather {
-        val endUrl = "forecast?lat=52.796761&lon=18.262070&appid=9152e67158d8e2a836aaf71f98a45cc7&lang=pl&units=metric"
+        val endUrl = "forecast?lat=${latitude}&lon=${longitude}&appid=9152e67158d8e2a836aaf71f98a45cc7&lang=pl&units=metric"
 
         return weatherRepository.getForecastWeather(endUrl)
     }

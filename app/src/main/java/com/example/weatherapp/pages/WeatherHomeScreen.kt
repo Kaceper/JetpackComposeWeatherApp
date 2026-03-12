@@ -260,12 +260,12 @@ fun VerySimpleChart(data: List<Float>, modifier: Modifier = Modifier) {
         val marginPx = 60f
         val spacex = (size.width - 2 * marginPx) / (data.size - 1)
 
-        // 2. Najpierw narysuj wszystkie linie (pod spodem)
+        // ajpierw narysuj wszystkie linie (pod spodem)
         for (i in 0 until data.size - 1) {
             val x1 = marginPx + (i * spacex)
             val x2 = marginPx + ((i + 1) * spacex)
-            val y1 = size.height - (data[i] * 10f) - 40f
-            val y2 = size.height - (data[i + 1] * 10f) - 40f
+            val y1 = size.height - (data[i] * 5f) - 40f
+            val y2 = size.height - (data[i + 1] * 5f) - 40f
 
             // Główna linia wykresu
             drawLine(Color.White, Offset(x1, y1), Offset(x2, y2), strokeWidth = 6f)
@@ -280,7 +280,7 @@ fun VerySimpleChart(data: List<Float>, modifier: Modifier = Modifier) {
         // Kropki na linii i tekst z temperaturą
         data.forEachIndexed { i, temp ->
             val x = marginPx + (i * spacex)
-            val y = size.height - (temp * 10f) - 40f
+            val y = size.height - (temp * 5f) - 40f
 
             drawCircle(Color.White, radius = 6f, center = Offset(x, y))
             drawContext.canvas.nativeCanvas.drawText("${temp.toInt()}°", x, y - 25f, textPaint)
