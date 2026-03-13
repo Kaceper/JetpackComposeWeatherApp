@@ -52,8 +52,6 @@ import com.example.weatherapp.data.HourlyForecast
 import com.example.weatherapp.utils.degree
 import com.example.weatherapp.utils.getIconUrl
 
-val temperatury = listOf(10f, 50f, 30f, 80f, 40f)
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherHomeScreen(isConnected: Boolean, onRefresh: () -> Unit, uiState: WeatherHomeUiState, modifier: Modifier = Modifier) {

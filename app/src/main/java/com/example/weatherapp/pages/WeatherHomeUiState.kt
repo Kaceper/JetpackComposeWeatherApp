@@ -2,7 +2,6 @@ package com.example.weatherapp.pages
 
 import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.DailyForecast
-import com.example.weatherapp.data.ForecastWeather
 import com.example.weatherapp.data.HourlyForecast
 
 // "data class" to odpowiednik "record" z C# 9.0+.

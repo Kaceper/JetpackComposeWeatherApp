@@ -6,6 +6,7 @@ import com.example.weatherapp.pages.ConnectivityState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 interface ConnectivityRepository {
     /** * StateFlow - odpowiednik Event z .NET Android, który dodatkowo przechowuje "ostatni znany stan"
@@ -18,7 +19,7 @@ interface ConnectivityRepository {
  * Nasłuchiwanie NetworkCallback jest wewnątrz repozytorium ponieważ
  * unikamy w ten sposób tworzenia zbędnych klas, odpowiada ona za dostarczania informacji o połączeniu
  */
-class DefaultConnectivityRepository(private val connectivityManager: ConnectivityManager) : ConnectivityRepository {
+class DefaultConnectivityRepository @Inject constructor(private val connectivityManager: ConnectivityManager) : ConnectivityRepository {
     /** * (Mutable) - tylko to repozytorium może zmieniać stan sieci
      * Chroni to przed sytuacją, w której błąd w UI mógłby "wymusić" fałszywy stan połączenia
      **/

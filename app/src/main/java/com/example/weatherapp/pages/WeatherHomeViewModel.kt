@@ -1,37 +1,30 @@
 package com.example.weatherapp.pages
 
-import android.app.Application
-import android.content.Context
-import android.net.ConnectivityManager
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableDoubleStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.weatherapp.R
 import com.example.weatherapp.data.ConnectivityRepository
 import com.example.weatherapp.data.CurrentWeather
 import com.example.weatherapp.data.DailyForecast
-import com.example.weatherapp.data.DefaultConnectivityRepository
 import com.example.weatherapp.data.ForecastWeather
 import com.example.weatherapp.data.HourlyForecast
 import com.example.weatherapp.data.WeatherRepository
-import com.example.weatherapp.data.WeatherRepositoryImpl
+import com.example.weatherapp.utils.WEATHER_API_KEY
 import com.example.weatherapp.utils.degree
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class WeatherHomeViewModel(private val connectivityRepository: ConnectivityRepository) : ViewModel() {
-    private val weatherRepository: WeatherRepository = WeatherRepositoryImpl()
-
+@HiltViewModel
+class WeatherHomeViewModel @Inject constructor(private val connectivityRepository: ConnectivityRepository, private val weatherRepository: WeatherRepository) : ViewModel() {
     var latitude by mutableDoubleStateOf(0.0)
         private set
 
@@ -91,13 +84,13 @@ class WeatherHomeViewModel(private val connectivityRepository: ConnectivityRepos
     }
 
     private suspend fun getCurrentData() : CurrentWeather {
-        val endUrl = "weather?lat=${latitude}&lon=${longitude}&appid=9152e67158d8e2a836aaf71f98a45cc7&lang=pl&units=metric"
+        val endUrl = "weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&lang=pl&units=metric"
 
         return weatherRepository.getCurrentWeather(endUrl)
     }
 
     private suspend fun getForecastData() : ForecastWeather {
-        val endUrl = "forecast?lat=${latitude}&lon=${longitude}&appid=9152e67158d8e2a836aaf71f98a45cc7&lang=pl&units=metric"
+        val endUrl = "forecast?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&lang=pl&units=metric"
 
         return weatherRepository.getForecastWeather(endUrl)
     }
@@ -177,13 +170,13 @@ class WeatherHomeViewModel(private val connectivityRepository: ConnectivityRepos
      * companion object to w Kotlinie odpowiednik słównika static z C# i Javy
      * Przechowuje zmienne i funkcje, które przynależą do samej klasy a nie do jej konkretnych instancji
      */
-    companion object {
-        val Factory: ViewModelProvider.Factory = viewModelFactory {
-            initializer {
-                val application = (this[APPLICATION_KEY] as Application)
-                val connectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-                WeatherHomeViewModel(connectivityRepository = DefaultConnectivityRepository(connectivityManager))
-            }
-        }
-    }
+//    companion object {
+//        val Factory: ViewModelProvider.Factory = viewModelFactory {
+//            initializer {
+//                val application = (this[APPLICATION_KEY] as Application)
+//                val connectivityManager = application.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+//                WeatherHomeViewModel(connectivityRepository = DefaultConnectivityRepository(connectivityManager))
+//            }
+//        }
+//    }
 }

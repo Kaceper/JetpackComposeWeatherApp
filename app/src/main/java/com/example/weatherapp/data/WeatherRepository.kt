@@ -1,6 +1,7 @@
 package com.example.weatherapp.data
 
-import com.example.weatherapp.network.WeatherApi
+import com.example.weatherapp.network.WeatherApiService
+import javax.inject.Inject
 
 /**
  * Repozytorium odpowiedzialne za pobieranie danych z API
@@ -17,12 +18,12 @@ interface WeatherRepository {
 /**
  * Implementacja repozytorium, używa w tym przypadku biblioteki Retrofit aby pobrać dane z API
  */
-class WeatherRepositoryImpl : WeatherRepository {
+class WeatherRepositoryImpl @Inject constructor(private val weatherApi: WeatherApiService) : WeatherRepository {
     override suspend fun getCurrentWeather(endUrl: String): CurrentWeather {
-        return WeatherApi.retrofitService.getCurrentWeather(endUrl)
+        return weatherApi.getCurrentWeather(endUrl)
     }
 
     override suspend fun getForecastWeather(endUrl: String): ForecastWeather {
-        return WeatherApi.retrofitService.getForecastWeather(endUrl)
+        return weatherApi.getForecastWeather(endUrl)
     }
 }
