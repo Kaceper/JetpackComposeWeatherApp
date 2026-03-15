@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,7 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Compress
@@ -29,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -55,6 +59,9 @@ import com.example.weatherapp.utils.getIconUrl
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WeatherHomeScreen(isConnected: Boolean, onRefresh: () -> Unit, uiState: WeatherHomeUiState, modifier: Modifier = Modifier) {
+
+    val isRefreshing = uiState is WeatherHomeUiState.Loading
+
     // Box - odpowiednik Grid bez wierszy i kolumn z XAMLa
     // układa elementy jedne na drugich
     Box(
@@ -71,36 +78,60 @@ fun WeatherHomeScreen(isConnected: Boolean, onRefresh: () -> Unit, uiState: Weat
                 )
             },*/
             containerColor = Color.Transparent
-        ) {
-            // Surface - odpowiednik "Panel" lub "Border" w XAML
-            Surface(
-               color = Color.Transparent,
+        )
+        { paddingValues ->
+            PullToRefreshBox(
+                isRefreshing = isRefreshing,
+                onRefresh = onRefresh,
                 modifier = Modifier
-                    .padding(it)
+                    .padding(paddingValues)
                     .fillMaxSize()
-                    .wrapContentSize(Alignment.Center)
             ) {
-                // Odpowiednik StackPanel (Orientation = "Vertical"), ułoży elementy jednej pod drugim
-                Column() {
-                    if (!isConnected) {
+                // Surface - odpowiednik "Panel" lub "Border" w XAML
+                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                    val screenHeight = maxHeight
+
+                    // 2. Przewijany kontener, żeby PullToRefresh mógł łapać gesty z palca
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .verticalScroll(rememberScrollState())
+                    ) {
+                        // Odpowiednik StackPanel (Orientation = "Vertical"), ułoży elementy jednej pod drugim
                         Column(
-                            modifier = Modifier.fillMaxSize(),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(screenHeight),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(
-                                text = stringResource(R.string.no_internet_connection),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }  else {
-                        when (uiState) {
-                            is WeatherHomeUiState.Error -> {
-                                ErrorSection(message = uiState.errorMessage.ifEmpty { stringResource(R.string.error_while_loading) }, onRefresh = onRefresh)
-                            }
+                            if (!isConnected) {
+                                Column(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .height(screenHeight),
+                                    verticalArrangement = Arrangement.Center,
+                                    horizontalAlignment = Alignment.CenterHorizontally
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.no_internet_connection),
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                }
+                            } else {
+                                when (uiState) {
+                                    is WeatherHomeUiState.Error -> {
+                                        ErrorSection(message = uiState.errorMessage.ifEmpty {
+                                            stringResource(
+                                                R.string.error_while_loading
+                                            )
+                                        }, onRefresh = onRefresh)
+                                    }
 
-                            is WeatherHomeUiState.Loading -> Text(text = stringResource(R.string.loading))
-                            is WeatherHomeUiState.Success -> WeatherSection(weather = uiState.weather)
+                                    is WeatherHomeUiState.Loading -> Text(text = stringResource(R.string.loading))
+                                    is WeatherHomeUiState.Success -> WeatherSection(weather = uiState.weather)
+                                }
+                            }
                         }
                     }
                 }
